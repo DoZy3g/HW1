@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BF-TEM Objective Aperture & Mass-Thickness Contrast | Zhengyang Deng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for crisp rendering of governing equations -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090d16;
+            color: #e2e8f0;
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Instrument-grade custom range slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #38bdf8;
+            border: 2px solid #0f172a;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.75);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #7dd3fc;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #0284c7 0%, #334155 100%);
+            border-radius: 999px;
+        }
+        /* Subtle panel glass border */
+        .panel-card {
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(51, 65, 85, 0.75);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- TOP INSTRUMENT HEADER -->
+    <header class="bg-slate-950/95 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase bg-sky-500/15 text-sky-300 rounded-md border border-sky-500/30">
+                        Electron Microscopy of Soft Matter (2026–2027)
+                    </span>
+                    <span class="px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase bg-emerald-500/15 text-emerald-300 rounded-md border border-emerald-500/30">
+                        HW1 • Q3 Topic 1
+                    </span>
+                </div>
+                <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-white mt-1 tracking-tight">
+                    Objective Aperture Size &amp; Mass-Thickness Contrast in Bright-Field TEM
+                </h1>
+            </div>
+
+            <!-- Student Identity Badge -->
+            <div class="bg-slate-900 border border-slate-700/90 rounded-xl px-4 py-2.5 flex items-center gap-4 shadow-inner shrink-0">
+                <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                    ZD
+                </div>
+                <div class="text-xs sm:text-sm">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400">Student:</span>
+                        <span class="font-semibold text-white tracking-wide">Zhengyang Deng</span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="text-slate-400">Student ID:</span>
+                        <span class="font-mono font-semibold text-sky-400">999015449</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-5 flex-grow">
+
+        <!-- ROW 1: MICROSCOPE PARAMETERS & SPECIMEN ARCHITECTURE -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+            
+            <!-- Microscope Operating Parameters -->
+            <section class="xl:col-span-5 panel-card rounded-2xl p-5 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        Instrument &amp; Optical Parameters
+                    </h2>
+                    <span class="text-[11px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">Fixed Calibration</span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block text-[11px]">Accelerating Voltage</span>
+                        <span class="font-mono font-bold text-white text-sm sm:text-base">120 kV</span>
+                        <span class="text-sky-400/80 font-mono text-[10px] block">$\lambda = 3.35\text{ pm}$</span>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block text-[11px]">Obj. Focal Length ($f_{\text{obj}}$)</span>
+                        <span class="font-mono font-bold text-white text-sm sm:text-base">3.20 mm</span>
+                        <span class="text-slate-500 text-[10px] block">$D = 2 f_{\text{obj}} \alpha_{\text{obj}}$</span>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block text-[11px]">Spherical Aberration ($C_s$)</span>
+                        <span class="font-mono font-bold text-white text-sm sm:text-base">1.20 mm</span>
+                        <span class="text-slate-500 text-[10px] block">Standard pole piece</span>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block text-[11px]">Camera Pixel Size</span>
+                        <span class="font-mono font-bold text-white text-sm sm:text-base">0.45 nm/px</span>
+                        <span class="text-slate-500 text-[10px] block">$400 \times 400\text{ px}$ FOV</span>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block text-[11px]">Electron Dose ($D_e$)</span>
+                        <span class="font-mono font-bold text-white text-sm sm:text-base">20 $e^-/\text{\AA}^2$</span>
+                        <span class="text-slate-500 text-[10px] block">Low-dose soft matter</span>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 block text-[11px]">Defocus ($\Delta f$)</span>
+                        <span class="font-mono font-bold text-emerald-400 text-sm sm:text-base">0 nm (Gaussian)</span>
+                        <span class="text-slate-500 text-[10px] block">Pure amplitude contrast</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Simulated Specimen Architecture -->
+            <section class="xl:col-span-7 panel-card rounded-2xl p-5 flex flex-col justify-between">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        Simulated Soft-Matter Specimen Model
+                    </h2>
+                    <span class="text-[11px] text-slate-400">Hover or touch simulated TEM image to inspect local specimen physics</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-2 font-semibold text-slate-200 mb-1">
+                            <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+                            Amorphous Carbon Film
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">
+                            Continuous support substrate ($Z=6$, $\rho=2.0\text{ g/cm}^3$, $t=15\text{ nm}$). Produces weak, broad-angle elastic background scattering.
+                        </p>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-2 font-semibold text-sky-300 mb-1">
+                            <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                            Unstained PS Latex Spheres
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">
+                            Polystyrene ($d=54\text{ nm}$ &amp; $28\text{ nm}$, $Z_{\text{eff}}\approx 5.6$, $\rho=1.05\text{ g/cm}^3$). Low-$Z$ polymer; contrast relies solely on local thickness $t(r)$.
+                        </p>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-2 font-semibold text-amber-300 mb-1">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                            $\text{OsO}_4$-Stained Block Copolymer
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">
+                            Osmium-stained polybutadiene core ($d=20\text{ nm}$, $Z_{\text{eff}}\approx 48.5$, $\rho=3.4\text{ g/cm}^3$) + $7.5\text{ nm}$ nanoclusters. Strong Rutherford scattering ($\propto Z^2$).
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ROW 2: INTERACTIVE APERTURE CONTROL DECK -->
+        <section class="panel-card rounded-2xl p-5 border-sky-500/30 bg-gradient-to-r from-slate-900/95 via-slate-900/90 to-slate-950/95">
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+                
+                <!-- Primary Slider Control -->
+                <div class="flex-grow space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-3">
+                            <label for="apertureSlider" class="text-sm sm:text-base font-bold text-white">
+                                Objective Aperture Semi-Angle ($\alpha_{\text{obj}}$):
+                            </label>
+                            <span id="alphaBadge" class="font-mono text-base sm:text-lg font-bold text-sky-400 bg-sky-950/90 px-3 py-0.5 rounded-lg border border-sky-500/40 shadow-inner">
+                                4.69 mrad
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs sm:text-sm font-mono">
+                            <span class="text-slate-300">Physical Diameter $D$: <strong id="diameterBadge" class="text-emerald-400">30.0 &mu;m</strong></span>
+                            <span class="hidden sm:inline text-slate-600">|</span>
+                            <span class="text-slate-300">Spatial Cutoff $q_{\max}$: <strong id="qMaxBadge" class="text-purple-300">1.40 nm<sup>-1</sup></strong></span>
+                        </div>
+                    </div>
+
+                    <input type="range" id="apertureSlider" min="1.5" max="45.0" step="0.05" value="4.69" class="w-full">
+
+                    <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                        <span>1.5 mrad (10 &mu;m • Max Contrast / Diffraction Limited)</span>
+                        <span>15 mrad (96 &mu;m)</span>
+                        <span>30 mrad (192 &mu;m)</span>
+                        <span>45 mrad (Open / No Aperture)</span>
+                    </div>
+                </div>
+
+                <!-- Standard TEM Aperture Presets -->
+                <div class="shrink-0 space-y-2">
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Standard TEM Aperture Presets:</div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        <button onclick="setAperture(1.56)" class="preset-btn px-3 py-2 rounded-xl bg-slate-950 hover:bg-sky-950/70 border border-slate-800 hover:border-sky-400 transition text-left">
+                            <div class="text-xs font-bold text-sky-300 font-mono">10 &mu;m</div>
+                            <div class="text-[10px] text-slate-400">1.56 mrad (Ultra-High Contrast)</div>
+                        </button>
+                        <button onclick="setAperture(4.69)" class="preset-btn px-3 py-2 rounded-xl bg-slate-950 hover:bg-sky-950/70 border border-slate-800 hover:border-sky-400 transition text-left">
+                            <div class="text-xs font-bold text-emerald-300 font-mono">30 &mu;m</div>
+                            <div class="text-[10px] text-slate-400">4.69 mrad (Soft Matter Optimal)</div>
+                        </button>
+                        <button onclick="setAperture(10.94)" class="preset-btn px-3 py-2 rounded-xl bg-slate-950 hover:bg-sky-950/70 border border-slate-800 hover:border-sky-400 transition text-left">
+                            <div class="text-xs font-bold text-sky-300 font-mono">70 &mu;m</div>
+                            <div class="text-[10px] text-slate-400">10.94 mrad (Balanced HR)</div>
+                        </button>
+                        <button onclick="setAperture(23.44)" class="preset-btn px-3 py-2 rounded-xl bg-slate-950 hover:bg-sky-950/70 border border-slate-800 hover:border-sky-400 transition text-left">
+                            <div class="text-xs font-bold text-purple-300 font-mono">150 &mu;m</div>
+                            <div class="text-[10px] text-slate-400">23.44 mrad (Low Contrast)</div>
+                        </button>
+                        <button onclick="setAperture(45.0)" class="preset-btn px-3 py-2 rounded-xl bg-slate-950 hover:bg-amber-950/50 border border-slate-800 hover:border-amber-400 transition text-left col-span-2 sm:col-span-1">
+                            <div class="text-xs font-bold text-amber-300 font-mono">None (Open)</div>
+                            <div class="text-[10px] text-slate-400">&ge;45 mrad (Nearly Invisible PS)</div>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ROW 3: THREE-COLUMN VISUALIZATION WORKSPACE -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+            <!-- COLUMN 1 (4 cols): Back Focal Plane / Ray Optics Switchable View -->
+            <div class="lg:col-span-4 panel-card rounded-2xl p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <h3 class="text-sm font-bold text-white">1. Back Focal Plane Filtering</h3>
+                        <div class="inline-flex rounded-lg bg-slate-950 p-0.5 border border-slate-800 text-[11px]">
+                            <button id="btnViewRay" onclick="setOpticsView('ray')" class="px-2.5 py-1 rounded-md bg-sky-600 text-white font-medium transition">Ray Path</button>
+                            <button id="btnViewBFP" onclick="setOpticsView('bfp')" class="px-2.5 py-1 rounded-md text-slate-400 hover:text-white font-medium transition">2D Diffraction</button>
+                        </div>
+                    </div>
+                    <p id="opticsDesc" class="text-xs text-slate-400 mb-3 leading-relaxed">
+                        Thin-lens ray diagram: electrons refract once at the objective lens and pass straight through the BFP aperture opening if $\theta \le \alpha_{\text{obj}}$.
+                    </p>
+                </div>
+
+                <div class="relative w-full aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden border border-slate-800">
+                    <canvas id="opticsCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div id="opticsLegend" class="mt-3 min-h-[24px] flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-300">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-emerald-400 inline-block"></span> Direct Beam</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-sky-400 inline-block"></span> Passed ($\theta \le \alpha_{\text{obj}}$)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-rose-500 inline-block"></span> Blocked ($\theta > \alpha_{\text{obj}}$)</span>
+                </div>
+            </div>
+
+            <!-- COLUMN 2 (4 cols): Simulated BF-TEM Micrograph with Interactive Probe -->
+            <div class="lg:col-span-4 panel-card rounded-2xl p-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <h3 class="text-sm font-bold text-white">2. Simulated BF-TEM Micrograph</h3>
+                        <div class="flex items-center gap-2">
+                            <button id="btnLutToggle" onclick="toggleLUT()" class="px-2 py-1 rounded-md bg-slate-950 border border-slate-700 hover:border-sky-400 text-[11px] text-slate-300 transition" title="Switch between Grayscale and Viridis False-Color Intensity Map">
+                                LUT: Grayscale
+                            </button>
+                            <label class="inline-flex items-center gap-1 text-[11px] text-slate-300 cursor-pointer bg-slate-950 px-2 py-1 rounded-md border border-slate-800">
+                                <input type="checkbox" id="shotNoiseToggle" checked class="rounded bg-slate-900 border-slate-600 text-sky-500 focus:ring-0">
+                                <span>Noise</span>
+                            </label>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3 leading-relaxed">
+                        Move cursor or touch image to probe local thickness, $Z_{\text{eff}}$, and normalized electron intensity $I/I_0$.
+                    </p>
+                </div>
+
+                <div class="relative w-full aspect-square bg-black rounded-xl overflow-hidden border border-slate-700 shadow-inner cursor-crosshair">
+                    <canvas id="temCanvas" class="w-full h-full block"></canvas>
+                    <!-- Floating Live Pixel Inspector Tooltip -->
+                    <div id="probeTooltip" class="hidden pointer-events-none absolute top-2.5 left-2.5 bg-slate-950/90 border border-sky-500/40 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-slate-200 shadow-lg backdrop-blur-sm">
+                        <div id="probeRegion" class="font-sans font-bold text-sky-300 mb-0.5">Amorphous Carbon Film</div>
+                        <div>Z_eff: <span id="probeZ" class="text-white">6.0</span> | t: <span id="probeT" class="text-white">15.0 nm</span></div>
+                        <div>Transmitted I/I0: <span id="probeI" class="text-emerald-400 font-bold">0.92</span></div>
+                    </div>
+                </div>
+
+                <div class="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                    <span>Cyan Line: Profile A–A'</span>
+                    <span>FOV: 180 &times; 180 nm</span>
+                </div>
+            </div>
+
+            <!-- COLUMN 3 (4 cols): Quantitative Line Profile & Contrast-Resolution Trade-off Curve -->
+            <div class="lg:col-span-4 panel-card rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                <div>
+                    <h3 class="text-sm font-bold text-white mb-1">3. Quantitative Contrast &amp; Resolution Analysis</h3>
+                    <p class="text-xs text-slate-400">Real-time cross-section intensity and aperture optimization curve.</p>
+                </div>
+
+                <!-- Plot A: Intensity Cross-Section A-A' -->
+                <div class="bg-slate-950 rounded-xl p-2.5 border border-slate-800">
+                    <div class="text-[11px] text-slate-400 mb-1 flex justify-between font-mono">
+                        <span>Intensity Profile ($I / I_0$)</span>
+                        <span class="text-cyan-400">Section A–A'</span>
+                    </div>
+                    <div class="w-full h-32">
+                        <canvas id="profileCanvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+
+                <!-- Plot B: Contrast vs Resolution Trade-off Curve -->
+                <div class="bg-slate-950 rounded-xl p-2.5 border border-slate-800">
+                    <div class="text-[11px] text-slate-400 mb-1 flex justify-between font-mono">
+                        <span>Aperture Trade-off Curve</span>
+                        <span class="text-amber-300">Contrast vs. Blur</span>
+                    </div>
+                    <div class="w-full h-32">
+                        <canvas id="tradeoffCanvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+
+                <!-- 4 Live Telemetry KPIs -->
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 text-[10px] uppercase block">PS Sphere Contrast</span>
+                        <span id="psContrastVal" class="font-mono text-base font-bold text-sky-400">14.2%</span>
+                        <span class="text-[10px] text-slate-500 block">Weber $(I_{\text{bg}}-I)/I_{\text{bg}}$</span>
+                    </div>
+                    <div class="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 text-[10px] uppercase block">$\text{OsO}_4$ Core Contrast</span>
+                        <span id="osContrastVal" class="font-mono text-base font-bold text-amber-400">68.5%</span>
+                        <span class="text-[10px] text-slate-500 block">Heavy-metal stain ($Z=76$)</span>
+                    </div>
+                    <div class="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 text-[10px] uppercase block">Diffraction Limit ($d_{\text{diff}}$)</span>
+                        <span id="diffResVal" class="font-mono text-sm font-semibold text-emerald-300">0.32 nm</span>
+                        <span class="text-[10px] text-slate-500 block">$0.61\lambda / \alpha_{\text{obj}}$</span>
+                    </div>
+                    <div class="bg-slate-950/90 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 text-[10px] uppercase block">Total Point Blur ($d_{\text{tot}}$)</span>
+                        <span id="totResVal" class="font-mono text-sm font-semibold text-purple-300">0.33 nm</span>
+                        <span class="text-[10px] text-slate-500 block">$\sqrt{d_{\text{diff}}^2 + d_{C_s}^2}$</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 4: GOVERNING EQUATIONS & PHYSICAL INTERPRETATION -->
+        <section class="panel-card rounded-2xl p-6 space-y-4">
+            <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                Governing Physical Equations &amp; Soft-Matter Contrast Principles
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/90 space-y-2">
+                    <h3 class="font-bold text-sky-300">1. Mass-Thickness Attenuation Law</h3>
+                    <p class="text-xs text-slate-400">
+                        In amorphous soft materials, electrons undergo incoherent elastic scattering. Those scattered beyond $\alpha_{\text{obj}}$ are intercepted by the objective aperture diaphragm, yielding exponential attenuation:
+                    </p>
+                    <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-center overflow-x-auto">
+                        $$I(\alpha_{\text{obj}}) = I_0 \exp\!\left[-\frac{N_A \sigma_{\text{el}}(\alpha_{\text{obj}})}{A} (\rho t)\right]$$
+                    </div>
+                    <p class="text-[11px] text-slate-400">
+                        Contrast increases exponentially with local mass-thickness $\rho t$ and effective scattering cross-section $\sigma_{\text{el}}(\alpha_{\text{obj}})$.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/90 space-y-2">
+                    <h3 class="font-bold text-emerald-300">2. Screened Rutherford Cross-Section</h3>
+                    <p class="text-xs text-slate-400">
+                        Integrating the differential Rutherford cross-section from $\alpha_{\text{obj}}$ to $\pi$ shows why heavy-atom stains ($\text{OsO}_4$, $Z=76$) produce dramatic dark contrast compared to carbon/polymers ($Z \approx 6$):
+                    </p>
+                    <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-center overflow-x-auto">
+                        $$\sigma_{\text{el}}(\alpha_{\text{obj}}) = \frac{Z^2 \lambda^4}{4\pi^3 a_0^2}\left(1+\frac{E}{E_0}\right)^2 \frac{1}{\theta_0^2 + \alpha_{\text{obj}}^2}$$
+                    </div>
+                    <p class="text-[11px] text-slate-400">
+                        Smaller $\alpha_{\text{obj}}$ lowers the denominator $(\theta_0^2 + \alpha_{\text{obj}}^2)$, capturing a much larger fraction of scattered electrons and boosting contrast.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/90 space-y-2">
+                    <h3 class="font-bold text-amber-300">3. Contrast vs. Resolution Trade-Off</h3>
+                    <p class="text-xs text-slate-400">
+                        Choosing $\alpha_{\text{obj}}$ requires balancing contrast against two competing optical aberrations (Airy diffraction vs. spherical aberration):
+                    </p>
+                    <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800 text-center overflow-x-auto">
+                        $$d_{\text{tot}} \approx \sqrt{\left(\frac{0.61\lambda}{\alpha_{\text{obj}}}\right)^2 + \left(0.25 C_s \alpha_{\text{obj}}^3\right)^2}$$
+                    </div>
+                    <p class="text-[11px] text-slate-400">
+                        An ultra-small aperture ($10\,\mu\text{m}$) blurs the $7.5\text{ nm}$ $\text{OsO}_4$ nanoparticles via diffraction; an open aperture ($>150\,\mu\text{m}$) washes out unstained polystyrene contrast and introduces $C_s \alpha^3$ blur.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER WITH AI ATTRIBUTION -->
+    <footer class="bg-slate-950 border-t border-slate-800/90 py-4 px-4 sm:px-6 lg:px-8 text-xs text-slate-400">
+        <div class="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                <strong class="text-slate-200">AI Tool Attribution:</strong> Simulation code and interactive visualization generated using <span class="text-sky-400 font-semibold">Google Gemini 3 Flash</span>. Physical equations verified against Williams &amp; Carter, <em>Transmission Electron Microscopy</em> (2nd ed.) and Egerton, <em>Physical Principles of Electron Microscopy</em>.
+            </div>
+            <div class="font-mono text-[11px] text-slate-500">
+                Zhengyang Deng (999015449) • HW1 Q3
+            </div>
+        </div>
+    </footer>
+
+    <!-- CORE PHYSICS & VISUALIZATION ENGINE -->
+    <script>
+        // =========================================================================
+        // 1. MICROSCOPE & PHYSICAL CONSTANTS (120 kV TEM)
+        // =========================================================================
+        const PARAMS = {
+            voltage_kV: 120,
+            lambda_nm: 0.003349,        // Relativistic electron wavelength at 120 kV (3.35 pm)
+            relFactor: 1 + 120 / 511,   // Relativistic factor (1 + E / m0c^2)
+            f_obj_mm: 3.2,              // Objective lens focal length (3.2 mm)
+            Cs_mm: 1.2,                 // Spherical aberration coefficient (1.2 mm)
+            a0_nm: 0.0529177,           // Bohr radius (nm)
+            NA: 6.02214e23,             // Avogadro constant
+            fov_nm: 180,                // Field of view (180 nm x 180 nm)
+            gridSize: 400,              // 400 x 400 px -> 0.45 nm/px
+            incidentElectronsPerPx: 405 // 20 e-/A^2 * (4.5 A)^2 = 405 electrons/px
+        };
+
+        const N = PARAMS.gridSize;
+        const bgPrefactor = new Float32Array(N * N);
+        const bgTheta0Sq = new Float32Array(N * N);
+        const featPrefactor = new Float32Array(N * N);
+        const featTheta0Sq = new Float32Array(N * N);
+
+        // Metadata maps for interactive mouse/touch hover inspection
+        const mapRegionId = new Uint8Array(N * N); // 0: Carbon, 1: PS Sphere, 2: Polymer Corona, 3: OsO4 Core
+        const mapThickness = new Float32Array(N * N);
+        const mapZeff = new Float32Array(N * N);
+
+        const fixedGaussianNoise = new Float32Array(N * N);
+        const rawIntensity = new Float32Array(N * N);
+        const blurredIntensity = new Float32Array(N * N);
+        const finalDisplayIntensity = new Float32Array(N * N);
+
+        let currentOpticsView = 'ray'; // 'ray' or 'bfp'
+        let useViridisLUT = false;
+
+        // Deterministic PRNG for reproducible specimen morphology & shot noise
+        let seed = 42026;
+        function rand() {
+            seed = (seed * 1664525 + 1013904223) % 4294967296;
+            return seed / 4294967296;
+        }
+        function randn() {
+            const u1 = Math.max(1e-7, rand());
+            const u2 = rand();
+            return Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+        }
+
+        // Screened Rutherford scattering prefactor & characteristic angle squared (rad^2)
+        function computeMaterialParams(Z, rho_gcm3, A_gmol, thickness_nm) {
+            const theta0 = (PARAMS.lambda_nm * Math.pow(Z, 1 / 3)) / (2 * Math.PI * PARAMS.a0_nm);
+            const theta0Sq = theta0 * theta0;
+            const sigmaPrefactor_nm2 = (Z * Z * Math.pow(PARAMS.lambda_nm, 4)) /
+                                       (4 * Math.pow(Math.PI, 3) * Math.pow(PARAMS.a0_nm, 2)) *
+                                       Math.pow(PARAMS.relFactor, 2);
+            const n_atoms_per_nm3 = (PARAMS.NA * rho_gcm3 * 1e-21) / A_gmol;
+            return {
+                prefactor: n_atoms_per_nm3 * sigmaPrefactor_nm2 * thickness_nm,
+                theta0Sq: theta0Sq
+            };
+        }
+
+        // =========================================================================
+        // 2. INITIALIZE 2D SOFT-MATTER SPECIMEN ARCHITECTURE
+        // =========================================================================
+        function initializeSpecimen() {
+            const nmPerPx = PARAMS.fov_nm / N;
+            const profileY = 200; // Cross-section A-A' runs horizontally through y = 200 (90 nm)
+
+            // Feature geometry coordinates (nm)
+            const largePS = { x: 52, y: 90, R: 27 };     // 54 nm unstained PS sphere on line A-A'
+            const micelleCore = { x: 132, y: 90, R: 10 }; // 20 nm OsO4-stained core on line A-A'
+            const micelleShell = { x: 132, y: 90, R: 24 };// 48 nm unstained polymer corona
+            const smallPS = { x: 92, y: 142, R: 14 };    // 28 nm secondary PS sphere
+
+            // Resolution test pair: two 7.5 nm OsO4 nanoclusters separated by 3.2 nm edge-to-edge
+            const nano1 = { x: 132, y: 36, R: 3.75 };
+            const nano2 = { x: 143, y: 36, R: 3.75 };
+
+            for (let py = 0; py < N; py++) {
+                const y_nm = py * nmPerPx;
+                for (let px = 0; px < N; px++) {
+                    const x_nm = px * nmPerPx;
+                    const idx = py * N + px;
+
+                    fixedGaussianNoise[idx] = randn();
+
+                    // Amorphous Carbon Film (15.0 +/- 0.8 nm ultra-flat support film)
+                    const granularity = 0.45 * Math.sin(x_nm * 0.55) * Math.cos(y_nm * 0.55) + 0.35 * randn();
+                    const t_carbon = Math.max(13.8, Math.min(16.2, 15.0 + granularity));
+                    const cMat = computeMaterialParams(6, 2.0, 12.01, t_carbon);
+                    bgPrefactor[idx] = cMat.prefactor;
+                    bgTheta0Sq[idx] = cMat.theta0Sq;
+
+                    let fPref = 0;
+                    let fThetaSq = 1e-4;
+                    let region = 0;
+                    let totalT = t_carbon;
+                    let zeff = 6.0;
+
+                    // 1. Large Unstained Polystyrene Sphere (54 nm)
+                    const d1 = Math.hypot(x_nm - largePS.x, y_nm - largePS.y);
+                    if (d1 < largePS.R) {
+                        const t_ps = 2 * Math.sqrt(largePS.R * largePS.R - d1 * d1);
+                        const psMat = computeMaterialParams(5.6, 1.05, 12.01, t_ps);
+                        fPref += psMat.prefactor;
+                        fThetaSq = psMat.theta0Sq;
+                        region = 1;
+                        totalT += t_ps;
+                        zeff = 5.6;
+                    }
+
+                    // 2. Small Unstained Polystyrene Sphere (28 nm)
+                    const dSmall = Math.hypot(x_nm - smallPS.x, y_nm - smallPS.y);
+                    if (dSmall < smallPS.R) {
+                        const t_ps = 2 * Math.sqrt(smallPS.R * smallPS.R - dSmall * dSmall);
+                        const psMat = computeMaterialParams(5.6, 1.05, 12.01, t_ps);
+                        fPref += psMat.prefactor;
+                        fThetaSq = psMat.theta0Sq;
+                        region = 1;
+                        totalT += t_ps;
+                        zeff = 5.6;
+                    }
+
+                    // 3. OsO4-Stained Block Copolymer Micelle (Core-Shell)
+                    const d2 = Math.hypot(x_nm - micelleShell.x, y_nm - micelleShell.y);
+                    if (d2 < micelleShell.R) {
+                        const t_shell = 2 * Math.sqrt(micelleShell.R * micelleShell.R - d2 * d2);
+                        const t_core = d2 < micelleCore.R ? 2 * Math.sqrt(micelleCore.R * micelleCore.R - d2 * d2) : 0;
+                        const t_corona_only = Math.max(0, t_shell - t_core);
+
+                        const shellMat = computeMaterialParams(5.8, 1.02, 12.01, t_corona_only);
+                        fPref += shellMat.prefactor;
+                        fThetaSq = shellMat.theta0Sq;
+                        region = 2;
+                        totalT += t_corona_only;
+                        zeff = 5.8;
+
+                        if (t_core > 0) {
+                            // OsO4-crosslinked polybutadiene (C4H6 + OsO4 -> Z_eff ~ 48.5, rho ~ 3.4 g/cm^3)
+                            const coreMat = computeMaterialParams(48.5, 3.4, 72.0, t_core);
+                            fPref += coreMat.prefactor;
+                            fThetaSq = coreMat.theta0Sq;
+                            region = 3;
+                            totalT += t_core;
+                            zeff = 48.5;
+                        }
+                    }
+
+                    // 4. Resolution Test Pair (7.5 nm OsO4 nanoclusters)
+                    [nano1, nano2].forEach(np => {
+                        const dn = Math.hypot(x_nm - np.x, y_nm - np.y);
+                        if (dn < np.R) {
+                            const t_np = 2 * Math.sqrt(np.R * np.R - dn * dn);
+                            const npMat = computeMaterialParams(56.0, 4.1, 88.0, t_np);
+                            fPref += npMat.prefactor;
+                            fThetaSq = npMat.theta0Sq;
+                            region = 3;
+                            totalT += t_np;
+                            zeff = 56.0;
+                        }
+                    });
+
+                    featPrefactor[idx] = fPref;
+                    featTheta0Sq[idx] = fThetaSq;
+                    mapRegionId[idx] = region;
+                    mapThickness[idx] = totalT;
+                    mapZeff[idx] = zeff;
+                }
+            }
+            window.profileRow = profileY;
+        }
+
+        // Separable 2D Gaussian Blur for diffraction + spherical aberration PSF
+        function applyGaussianPSF(src, dst, sigmaPx) {
+            if (sigmaPx < 0.35) {
+                dst.set(src);
+                return;
+            }
+            const radius = Math.min(22, Math.ceil(sigmaPx * 2.0));
+            const kernel = new Float32Array(2 * radius + 1);
+            let sum = 0;
+            for (let i = -radius; i <= radius; i++) {
+                const w = Math.exp(-(i * i) / (2 * sigmaPx * sigmaPx));
+                kernel[i + radius] = w;
+                sum += w;
+            }
+            for (let i = 0; i < kernel.length; i++) kernel[i] /= sum;
+
+            const temp = new Float32Array(N * N);
+            for (let y = 0; y < N; y++) {
+                const rowOffset = y * N;
+                for (let x = 0; x < N; x++) {
+                    let acc = 0;
+                    for (let k = -radius; k <= radius; k++) {
+                        const xx = x + k < 0 ? 0 : (x + k >= N ? N - 1 : x + k);
+                        acc += src[rowOffset + xx] * kernel[k + radius];
+                    }
+                    temp[rowOffset + x] = acc;
+                }
+            }
+            for (let x = 0; x < N; x++) {
+                for (let y = 0; y < N; y++) {
+                    let acc = 0;
+                    for (let k = -radius; k <= radius; k++) {
+                        const yy = y + k < 0 ? 0 : (y + k >= N ? N - 1 : y + k);
+                        acc += temp[yy * N + x] * kernel[k + radius];
+                    }
+                    dst[y * N + x] = acc;
+                }
+            }
+        }
+
+        // =========================================================================
+        // 3. MAIN SIMULATION STEP
+        // =========================================================================
+        const slider = document.getElementById('apertureSlider');
+        const noiseToggle = document.getElementById('shotNoiseToggle');
+        const temCanvas = document.getElementById('temCanvas');
+        const temCtx = temCanvas.getContext('2d');
+        const offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = N;
+        offscreenCanvas.height = N;
+        const offCtx = offscreenCanvas.getContext('2d');
+        const imgData = offCtx.createImageData(N, N);
+
+        function setAperture(val) {
+            slider.value = val;
+            updateSimulation();
+        }
+
+        function setOpticsView(mode) {
+            currentOpticsView = mode;
+            const btnRay = document.getElementById('btnViewRay');
+            const btnBFP = document.getElementById('btnViewBFP');
+            const desc = document.getElementById('opticsDesc');
+            const legend = document.getElementById('opticsLegend');
+
+            if (mode === 'ray') {
+                btnRay.className = 'px-2.5 py-1 rounded-md bg-sky-600 text-white font-medium transition';
+                btnBFP.className = 'px-2.5 py-1 rounded-md text-slate-400 hover:text-white font-medium transition';
+                desc.innerHTML = 'Thin-lens ray diagram: electrons refract once at the objective lens and pass straight through the BFP aperture opening if $\\theta \\le \\alpha_{\\text{obj}}$.';
+                legend.innerHTML = `
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-emerald-400 inline-block"></span> Direct Beam</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-sky-400 inline-block"></span> Passed ($\\theta \\le \\alpha_{\\text{obj}}$)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-rose-500 inline-block"></span> Blocked ($\\theta > \\alpha_{\\text{obj}}$)</span>
+                `;
+            } else {
+                btnBFP.className = 'px-2.5 py-1 rounded-md bg-sky-600 text-white font-medium transition';
+                btnRay.className = 'px-2.5 py-1 rounded-md text-slate-400 hover:text-white font-medium transition';
+                desc.innerHTML = '2D Back Focal Plane (BFP) diffraction intensity: the white dashed circle represents the physical objective aperture cutoff $q_{\\max} = \\alpha_{\\text{obj}}/\\lambda$.';
+                legend.innerHTML = `
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-white inline-block"></span> Central Beam (000)</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full border border-dashed border-sky-400 inline-block"></span> Aperture Rim</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-600 inline-block"></span> Amorphous Halo</span>
+                `;
+            }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise([desc, legend]);
+            }
+            updateSimulation();
+        }
+
+        function toggleLUT() {
+            useViridisLUT = !useViridisLUT;
+            const btn = document.getElementById('btnLutToggle');
+            btn.textContent = useViridisLUT ? 'LUT: False-Color' : 'LUT: Grayscale';
+            btn.classList.toggle('border-sky-400', useViridisLUT);
+            btn.classList.toggle('text-sky-300', useViridisLUT);
+            updateSimulation();
+        }
+
+        // Viridis-like scientific false-color ramp for intensity visualization
+        function intensityToViridis(t) {
+            const c = Math.max(0, Math.min(1, t));
+            const r = Math.round(255 * Math.min(1, Math.max(0, 1.5 * c - 0.35 + 0.25 * Math.sin(c * Math.PI))));
+            const g = Math.round(255 * Math.pow(c, 0.85));
+            const b = Math.round(255 * (0.35 + 0.65 * Math.sin(c * Math.PI * 0.85)));
+            return [r, g, b];
+        }
+
+        function updateSimulation() {
+            const alpha_mrad = parseFloat(slider.value);
+            const alpha_rad = alpha_mrad * 1e-3;
+            const alphaSq = alpha_rad * alpha_rad;
+
+            // Physical aperture diameter D = 2 * f_obj * alpha
+            const diameter_um = 2 * (PARAMS.f_obj_mm * 1000) * alpha_rad;
+            const qMax_inv_nm = alpha_rad / PARAMS.lambda_nm;
+
+            document.getElementById('alphaBadge').textContent = `${alpha_mrad.toFixed(2)} mrad`;
+            document.getElementById('diameterBadge').innerHTML = alpha_mrad >= 44.9 ? 'Open (No Ap.)' : `${diameter_um.toFixed(1)} &mu;m`;
+            document.getElementById('qMaxBadge').innerHTML = `${qMax_inv_nm.toFixed(2)} nm<sup>-1</sup>`;
+
+            // Highlight matching preset button if within tolerance
+            const presetValues = [1.56, 4.69, 10.94, 23.44, 45.0];
+            document.querySelectorAll('.preset-btn').forEach((btn, i) => {
+                const isActive = Math.abs(alpha_mrad - presetValues[i]) < 0.08;
+                btn.classList.toggle('ring-2', isActive);
+                btn.classList.toggle('ring-sky-400', isActive);
+                btn.classList.toggle('bg-slate-900', isActive);
+            });
+
+            // Optical Resolution Limits (Airy diffraction disk vs. Circle of Least Confusion for Cs)
+            const d_diff_nm = (0.61 * PARAMS.lambda_nm) / alpha_rad;
+            const d_cs_nm = 0.25 * (PARAMS.Cs_mm * 1e6) * Math.pow(alpha_rad, 3);
+            const d_tot_nm = Math.sqrt(d_diff_nm * d_diff_nm + d_cs_nm * d_cs_nm);
+
+            document.getElementById('diffResVal').textContent = `${d_diff_nm.toFixed(2)} nm`;
+            document.getElementById('totResVal').textContent = `${d_tot_nm.toFixed(2)} nm`;
+
+            // Compute Transmitted Intensity at every pixel
+            for (let idx = 0; idx < N * N; idx++) {
+                const tau_bg = bgPrefactor[idx] / (bgTheta0Sq[idx] + alphaSq);
+                const tau_feat = featPrefactor[idx] > 0 ? featPrefactor[idx] / (featTheta0Sq[idx] + alphaSq) : 0;
+                rawIntensity[idx] = Math.exp(-(tau_bg + tau_feat));
+            }
+
+            // Convolve with PSF (scaled for visual clarity on 0.45 nm/px grid)
+            const nmPerPx = PARAMS.fov_nm / N;
+            const sigmaPx = Math.min(24, (d_tot_nm * 0.75) / nmPerPx);
+            applyGaussianPSF(rawIntensity, blurredIntensity, sigmaPx);
+
+            // Render Micrograph Pixels
+            const useNoise = noiseToggle.checked;
+            const data = imgData.data;
+
+            for (let idx = 0; idx < N * N; idx++) {
+                let val = blurredIntensity[idx];
+                if (useNoise) {
+                    const nElectrons = Math.max(1, PARAMS.incidentElectronsPerPx * val);
+                    val += fixedGaussianNoise[idx] * (1.0 / Math.sqrt(nElectrons));
+                }
+                val = Math.max(0, Math.min(1, val));
+                finalDisplayIntensity[idx] = val;
+                const normVal = Math.max(0, Math.min(1, val * 0.94));
+                const pIdx = idx * 4;
+
+                if (useViridisLUT) {
+                    const [r, g, b] = intensityToViridis(normVal);
+                    data[pIdx] = r;
+                    data[pIdx + 1] = g;
+                    data[pIdx + 2] = b;
+                } else {
+                    const gray = Math.round(normVal * 255);
+                    data[pIdx] = gray;
+                    data[pIdx + 1] = gray;
+                    data[pIdx + 2] = gray;
+                }
+                data[pIdx + 3] = 255;
+            }
+            offCtx.putImageData(imgData, 0, 0);
+
+            // Draw onto responsive display canvas
+            const rect = temCanvas.parentElement.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) return;
+            const dpr = window.devicePixelRatio || 1;
+            temCanvas.width = rect.width * dpr;
+            temCanvas.height = rect.height * dpr;
+            temCtx.save();
+            temCtx.scale(dpr, dpr);
+            temCtx.imageSmoothingEnabled = true;
+            temCtx.imageSmoothingQuality = 'high';
+            temCtx.drawImage(offscreenCanvas, 0, 0, rect.width, rect.height);
+
+            // Overlay Profile Line A-A' & Scale Bar
+            const lineY = (window.profileRow / N) * rect.height;
+            temCtx.strokeStyle = 'rgba(34, 211, 238, 0.72)';
+            temCtx.setLineDash([5, 4]);
+            temCtx.lineWidth = 1.5;
+            temCtx.beginPath();
+            temCtx.moveTo(0, lineY);
+            temCtx.lineTo(rect.width, lineY);
+            temCtx.stroke();
+            temCtx.setLineDash([]);
+
+            temCtx.fillStyle = '#22d3ee';
+            temCtx.font = 'bold 11px JetBrains Mono, monospace';
+            temCtx.fillText('A', 8, lineY - 5);
+            temCtx.fillText("A'", rect.width - 20, lineY - 5);
+
+            // Specimen annotations aligned to true feature coordinates with contrast halo
+            temCtx.save();
+            temCtx.font = '600 10px Inter, sans-serif';
+            temCtx.textAlign = 'center';
+            temCtx.strokeStyle = 'rgba(2, 6, 23, 0.85)';
+            temCtx.lineWidth = 3;
+            temCtx.fillStyle = '#f1f5f9';
+
+            const labels = [
+                { text: 'Unstained PS (54 nm)', x: (52 / PARAMS.fov_nm) * rect.width, y: lineY + 42 },
+                { text: 'OsO4 Micelle', x: (132 / PARAMS.fov_nm) * rect.width, y: lineY + 38 },
+                { text: '7.5 nm OsO4 Pair', x: (137.5 / PARAMS.fov_nm) * rect.width, y: (24 / PARAMS.fov_nm) * rect.height }
+            ];
+            labels.forEach(lbl => {
+                temCtx.strokeText(lbl.text, lbl.x, lbl.y);
+                temCtx.fillText(lbl.text, lbl.x, lbl.y);
+            });
+            temCtx.restore();
+
+            // 30 nm Scale Bar
+            const sbWidth = (30 / PARAMS.fov_nm) * rect.width;
+            const sbX = rect.width - sbWidth - 14;
+            const sbY = rect.height - 16;
+            temCtx.fillStyle = 'rgba(2, 6, 23, 0.78)';
+            temCtx.fillRect(sbX - 6, sbY - 15, sbWidth + 12, 22);
+            temCtx.fillStyle = '#ffffff';
+            temCtx.fillRect(sbX, sbY, sbWidth, 3);
+            temCtx.font = 'bold 10px JetBrains Mono, monospace';
+            temCtx.fillText('30 nm', sbX + sbWidth / 2 - 14, sbY - 4);
+            temCtx.restore();
+
+            // Update Quantitative Contrast KPIs
+            const rowOffset = window.profileRow * N;
+            const I_bg = blurredIntensity[rowOffset + 15];
+            const I_ps = blurredIntensity[rowOffset + Math.round((52 / PARAMS.fov_nm) * N)];
+            const I_os = blurredIntensity[rowOffset + Math.round((132 / PARAMS.fov_nm) * N)];
+
+            const C_ps = Math.max(0, ((I_bg - I_ps) / I_bg) * 100);
+            const C_os = Math.max(0, ((I_bg - I_os) / I_bg) * 100);
+
+            document.getElementById('psContrastVal').textContent = `${C_ps.toFixed(1)}%`;
+            document.getElementById('osContrastVal').textContent = `${C_os.toFixed(1)}%`;
+
+            // Render Sub-Visualizations
+            drawOpticsCanvas(alpha_mrad);
+            drawProfileChart(rowOffset, I_bg);
+            drawTradeoffChart(alpha_mrad);
+        }
+
+        // =========================================================================
+        // 4. BACK FOCAL PLANE OPTICS (RAY DIAGRAM OR 2D DIFFRACTION)
+        // =========================================================================
+        function drawOpticsCanvas(alpha_mrad) {
+            const canvas = document.getElementById('opticsCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) return;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (currentOpticsView === 'ray') {
+                drawRayDiagram(ctx, w, h, alpha_mrad);
+            } else {
+                drawBFP2D(ctx, w, h, alpha_mrad);
+            }
+            ctx.restore();
+        }
+
+        function drawRayDiagram(ctx, w, h, alpha_mrad) {
+            const cx = w * 0.54;
+            const yInc = h * 0.03;
+            const yLens = h * 0.44; // Objective lens principal plane
+            const yBFP  = h * 0.63; // Back focal plane (f = 0.19h below lens)
+            const yImg  = h * 0.92; // Gaussian image plane (v = 0.48h below lens)
+
+            // Exact thin-lens conjugate object plane: 1/u + 1/v = 1/f  =>  u = (f * v) / (v - f)
+            const f = yBFP - yLens;
+            const v = yImg - yLens;
+            const u = (f * v) / (v - f);
+            const ySpec = yLens - u; // Exact conjugate object plane (~0.126h)
+            const mag = v / u;       // Exact lateral magnification M = v / u
+
+            // Optical Axis
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(cx, 4); ctx.lineTo(cx, h - 4); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Parallel Incident Electron Wave
+            ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
+            ctx.lineWidth = 1.5;
+            [-22, -11, 0, 11, 22].forEach(dx => {
+                ctx.beginPath(); ctx.moveTo(cx + dx, yInc); ctx.lineTo(cx + dx, ySpec); ctx.stroke();
+            });
+
+            // Specimen Plane
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(cx - w * 0.30, ySpec); ctx.lineTo(cx + w * 0.30, ySpec); ctx.stroke();
+            ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx - 14, ySpec, 3.8, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.arc(cx + 14, ySpec, 3.5, 0, Math.PI * 2); ctx.fill();
+
+            // Objective Lens Principal Plane (wide enough to contain all high-angle scattered rays)
+            const lensW = w * 0.42;
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.14)';
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - lensW, yLens);
+            ctx.quadraticCurveTo(cx, yLens - 12, cx + lensW, yLens);
+            ctx.quadraticCurveTo(cx, yLens + 12, cx - lensW, yLens);
+            ctx.fill(); ctx.stroke();
+
+            // Objective Aperture Blades in the Back Focal Plane (BFP)
+            const maxGap = w * 0.30;
+            const gapPx = Math.max(4, Math.min(maxGap, (alpha_mrad / 45) * maxGap));
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(cx - w * 0.42, yBFP - 3, w * 0.42 - gapPx, 6);
+            ctx.fillRect(cx + gapPx, yBFP - 3, w * 0.42 - gapPx, 6);
+
+            // Conjugate Image Plane
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(cx - w * 0.38, yImg); ctx.lineTo(cx + w * 0.38, yImg); ctx.stroke();
+
+            // 1. Unscattered Direct Beam (theta = 0):
+            // Travels parallel to optical axis from specimen (x0) to lens (x0),
+            // refracts at the lens through the back focal point (0 at yBFP),
+            // and continues in a STRAIGHT LINE to the inverted image point (-mag * x0 at yImg).
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 2;
+            [-14, 0, 14].forEach(x0 => {
+                const xImg = -mag * x0;
+                ctx.beginPath();
+                ctx.moveTo(cx + x0, ySpec);
+                ctx.lineTo(cx + x0, yLens);
+                ctx.lineTo(cx + xImg, yImg);
+                ctx.stroke();
+            });
+
+            // 2. Elastically Scattered Electrons (scattering angle theta):
+            // Bends strictly ONCE at the objective lens principal plane (yLens),
+            // passes through r_bfp in the BFP, and continues in a straight line to xImg.
+            [5, 11, 19, 29, 40].forEach(theta => {
+                const r_bfp = (theta / 45) * maxGap;
+                const blocked = r_bfp > gapPx;
+
+                [-1, 1].forEach(dir => {
+                    const x0 = dir * 14;          // Specimen feature position
+                    const xBFP = dir * r_bfp;     // Exact BFP crossover position
+                    const xImg = -mag * x0;       // Exact conjugate image position
+
+                    // Straight ray trajectory after the lens: line connecting (xBFP, yBFP) and (xImg, yImg)
+                    const slopeAfterLens = (xImg - xBFP) / (yImg - yBFP);
+                    const xLens = Math.max(-lensW + 4, Math.min(lensW - 4, xBFP - slopeAfterLens * (yBFP - yLens)));
+
+                    ctx.strokeStyle = blocked ? 'rgba(244, 63, 94, 0.85)' : 'rgba(56, 189, 248, 0.88)';
+                    ctx.lineWidth = blocked ? 1.4 : 1.7;
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx + x0, ySpec);
+                    ctx.lineTo(cx + xLens, yLens); // Single magnetic refraction at Objective Lens
+
+                    if (!blocked) {
+                        // Straight line through aperture hole to conjugate image point
+                        ctx.lineTo(cx + xImg, yImg);
+                        ctx.stroke();
+                    } else {
+                        // Straight line from lens to aperture blade where it is absorbed
+                        ctx.lineTo(cx + xBFP, yBFP);
+                        ctx.stroke();
+                        ctx.fillStyle = '#f43f5e';
+                        ctx.beginPath(); ctx.arc(cx + xBFP, yBFP, 2.3, 0, Math.PI * 2); ctx.fill();
+                    }
+                });
+            });
+
+            // Plane Labels
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.fillText('Specimen', 8, ySpec + 3);
+            ctx.fillText('Obj. Lens', 8, yLens + 3);
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 10px Inter, sans-serif';
+            ctx.fillText('Aperture', 8, yBFP - 5);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.fillText('(BFP)', 8, yBFP + 7);
+            ctx.fillText('Image Plane', 8, yImg - 4);
+        }
+
+        function drawBFP2D(ctx, w, h, alpha_mrad) {
+            const cx = w / 2;
+            const cy = h / 2;
+            const maxR = Math.min(w, h) * 0.44;
+            const apR = Math.max(5, (alpha_mrad / 45) * maxR);
+
+            // Amorphous Carbon + Polymer Halo & High-Angle Heavy-Metal Rutherford Tail
+            const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, maxR);
+            grad.addColorStop(0.0, 'rgba(255, 255, 255, 0.95)');
+            grad.addColorStop(0.14, 'rgba(56, 189, 248, 0.62)');
+            grad.addColorStop(0.32, 'rgba(148, 163, 184, 0.34)');
+            grad.addColorStop(0.58, 'rgba(251, 191, 36, 0.16)');
+            grad.addColorStop(1.0, 'rgba(15, 23, 42, 0.0)');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dark Mask Outside the Objective Aperture Hole
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, w, h);
+            ctx.arc(cx, cy, apR, 0, Math.PI * 2, true);
+            ctx.fillStyle = 'rgba(2, 6, 23, 0.85)';
+            ctx.fill();
+            ctx.restore();
+
+            // Objective Aperture Rim
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+            ctx.beginPath();
+            ctx.arc(cx, cy, apR, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Bright Unscattered Direct Beam (000)
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            const alpha_rad = alpha_mrad * 1e-3;
+            const qMax = (alpha_rad / PARAMS.lambda_nm).toFixed(2);
+            const cMat = computeMaterialParams(6, 2.0, 12.01, 15.0);
+            const fluxPct = Math.round(Math.exp(-cMat.prefactor / (cMat.theta0Sq + alpha_rad * alpha_rad)) * 100);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '10px JetBrains Mono, monospace';
+            ctx.fillText(`Cutoff: ${alpha_mrad.toFixed(2)} mrad (${qMax} nm\u207B\u00B9)`, 10, 16);
+            ctx.fillText(`Substrate Transmitted Flux: ${fluxPct}%`, 10, h - 10);
+        }
+
+        // =========================================================================
+        // 5. QUANTITATIVE LINE PROFILE & TRADE-OFF CURVE
+        // =========================================================================
+        function drawProfileChart(rowOffset, I_bg) {
+            const canvas = document.getElementById('profileCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) return;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+            const padL = 28, padR = 8, padT = 8, padB = 16;
+            const pw = w - padL - padR;
+            const ph = h - padT - padB;
+
+            // Grid
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.45)';
+            ctx.lineWidth = 1;
+            [0, 0.5, 1.0].forEach(v => {
+                const y = padT + ph * (1 - v);
+                ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + pw, y); ctx.stroke();
+                ctx.fillStyle = '#64748b';
+                ctx.font = '9px JetBrains Mono, monospace';
+                ctx.fillText(v.toFixed(1), 4, y + 3);
+            });
+
+            // Background reference line
+            const yBg = padT + ph * (1 - I_bg);
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(padL, yBg); ctx.lineTo(padL + pw, yBg); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Intensity Curve
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            for (let x = 0; x < N; x++) {
+                const px = padL + (x / (N - 1)) * pw;
+                const py = padT + ph * (1 - blurredIntensity[rowOffset + x]);
+                if (x === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '9px Inter, sans-serif';
+            ctx.fillText('PS Sphere', padL + pw * 0.16, h - 4);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillText('OsO4 Core', padL + pw * 0.64, h - 4);
+            ctx.restore();
+        }
+
+        function drawTradeoffChart(currentAlpha) {
+            const canvas = document.getElementById('tradeoffCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) return;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+            const padL = 28, padR = 10, padT = 8, padB = 16;
+            const pw = w - padL - padR;
+            const ph = h - padT - padB;
+
+            // Sample across 1.5 -> 45 mrad
+            const steps = 60;
+            const cMat = computeMaterialParams(6, 2.0, 12.01, 15.0);
+            const psMat = computeMaterialParams(5.6, 1.05, 12.01, 54.0);
+
+            // 1. Contrast Curve (Blue, normalized to max contrast at 1.5 mrad)
+            ctx.beginPath();
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 1.8;
+            let maxC = 0;
+            const cVals = [];
+            for (let i = 0; i <= steps; i++) {
+                const a_mrad = 1.5 + (i / steps) * (45.0 - 1.5);
+                const aSq = Math.pow(a_mrad * 1e-3, 2);
+                const I_bg = Math.exp(-cMat.prefactor / (cMat.theta0Sq + aSq));
+                const I_ps = Math.exp(-(cMat.prefactor / (cMat.theta0Sq + aSq) + psMat.prefactor / (psMat.theta0Sq + aSq)));
+                const C = (I_bg - I_ps) / I_bg;
+                cVals.push(C);
+                if (C > maxC) maxC = C;
+            }
+            for (let i = 0; i <= steps; i++) {
+                const px = padL + (i / steps) * pw;
+                const py = padT + ph * (1 - cVals[i] / Math.max(0.01, maxC));
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // 2. Resolution Blur Curve (Amber, U-shaped curve showing diffraction + Cs trade-off)
+            ctx.beginPath();
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 1.6;
+            for (let i = 0; i <= steps; i++) {
+                const a_mrad = 1.5 + (i / steps) * (45.0 - 1.5);
+                const a_rad = a_mrad * 1e-3;
+                const d_diff = (0.61 * PARAMS.lambda_nm) / a_rad;
+                const d_cs = 0.25 * (PARAMS.Cs_mm * 1e6) * Math.pow(a_rad, 3);
+                const d_tot = Math.sqrt(d_diff * d_diff + d_cs * d_cs);
+                const normY = Math.min(1, Math.log10(1 + d_tot * 4) / Math.log10(1 + 28 * 4));
+
+                const px = padL + (i / steps) * pw;
+                const py = padT + ph * (1 - normY);
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Current Aperture Vertical Marker
+            const curX = padL + ((currentAlpha - 1.5) / (45.0 - 1.5)) * pw;
+            ctx.strokeStyle = '#34d399';
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(curX, padT); ctx.lineTo(curX, padT + ph); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Y-axis normalized scale ticks
+            ctx.fillStyle = '#64748b';
+            ctx.font = '8px JetBrains Mono, monospace';
+            ctx.fillText('1.0', 6, padT + 6);
+            ctx.fillText('0.0', 6, padT + ph);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '9px Inter, sans-serif';
+            ctx.fillText('Contrast', padL + 4, padT + 10);
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillText('Point Blur d_tot', padL + pw - 76, padT + 10);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('1.5 mrad', padL, h - 4);
+            ctx.fillText('45 mrad', padL + pw - 36, h - 4);
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // 6. INTERACTIVE MICROGRAPH PROBE & EVENT LISTENERS
+        // =========================================================================
+        const probeTooltip = document.getElementById('probeTooltip');
+
+        function handleMicrographProbe(clientX, clientY) {
+            const rect = temCanvas.getBoundingClientRect();
+            const px = Math.floor(((clientX - rect.left) / rect.width) * N);
+            const py = Math.floor(((clientY - rect.top) / rect.height) * N);
+
+            if (px >= 0 && px < N && py >= 0 && py < N) {
+                const idx = py * N + px;
+                const regNames = [
+                    'Amorphous Carbon Film',
+                    'Unstained Polystyrene (PS)',
+                    'Unstained Polymer Corona',
+                    'OsO\u2084-Stained Domain (Heavy Z)'
+                ];
+                probeTooltip.classList.remove('hidden');
+                document.getElementById('probeRegion').textContent = regNames[mapRegionId[idx]];
+                document.getElementById('probeZ').textContent = mapZeff[idx].toFixed(1);
+                document.getElementById('probeT').textContent = mapThickness[idx].toFixed(1) + ' nm';
+                document.getElementById('probeI').textContent = finalDisplayIntensity[idx].toFixed(3);
+            }
+        }
+
+        temCanvas.addEventListener('mousemove', (e) => {
+            handleMicrographProbe(e.clientX, e.clientY);
+        });
+
+        temCanvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                handleMicrographProbe(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        temCanvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                e.preventDefault();
+                handleMicrographProbe(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: false });
+
+        temCanvas.addEventListener('mouseleave', () => {
+            probeTooltip.classList.add('hidden');
+        });
+
+        temCanvas.addEventListener('touchend', () => {
+            probeTooltip.classList.add('hidden');
+        });
+
+        slider.addEventListener('input', updateSimulation);
+        noiseToggle.addEventListener('change', updateSimulation);
+        window.addEventListener('resize', updateSimulation);
+
+        window.onload = function () {
+            initializeSpecimen();
+            updateSimulation();
+            const renderMath = () => {
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise();
+                }
+            };
+            if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+                window.MathJax.startup.promise.then(renderMath);
+            } else {
+                setTimeout(renderMath, 400);
+            }
+        };
+    </script>
+</body>
+</html>
