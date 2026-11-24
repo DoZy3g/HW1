@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BF TEM — Objective Aperture vs Mass-Thickness Contrast</title>
+<style>
+  body { font-family: 'Times New Roman', serif; background: #f4f6f8; color: #1a1a1a; margin: 0; padding: 16px; }
+  header { text-align: center; border-bottom: 3px double #1a3a5a; padding-bottom: 10px; margin-bottom: 16px; }
+  header h1 { margin: 0 0 4px 0; font-size: 22px; color: #1a3a5a; }
+  header .meta { font-size: 14px; color: #444; }
+  .wrap { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+  .panel { background: #fff; border: 1px solid #c0c8d0; border-radius: 6px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .panel h3 { margin: 0 0 8px 0; font-size: 14px; color: #1a3a5a; border-bottom: 1px solid #e0e6ec; padding-bottom: 4px; }
+  canvas { display: block; }
+  .controls { min-width: 320px; }
+  .controls label { display: block; font-size: 14px; margin: 8px 0 2px 0; font-weight: bold; }
+  input[type=range] { width: 100%; }
+  .presets button { margin: 4px 4px 0 0; padding: 4px 10px; font-size: 13px; cursor: pointer; border: 1px solid #1a3a5a; background: #e8eef4; border-radius: 4px; }
+  .presets button:hover { background: #c8d8e8; }
+  select { font-size: 14px; padding: 3px 6px; }
+  .readout { font-family: monospace; font-size: 13px; background: #f0f4f8; padding: 8px; border-radius: 4px; margin-top: 10px; line-height: 1.6; }
+  .eq { font-family: monospace; font-size: 13px; background: #f8fafc; padding: 8px 10px; border-left: 3px solid #1a3a5a; margin: 10px 0; line-height: 1.5; }
+  footer { margin-top: 20px; font-size: 12px; color: #555; text-align: center; border-top: 1px solid #c0c8d0; padding-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Objective Aperture Size and Mass-Thickness Contrast in BF TEM</h1>
+  <div class="meta">Your Full Name &nbsp;·&nbsp; Student ID: XXXXXXXXX</div>
+</header>
+
+<div class="wrap">
+  <div class="panel">
+    <h3>Specimen cross-section (mass-thickness x)</h3>
+    <canvas id="xs" width="360" height="220"></canvas>
+  </div>
+  <div class="panel">
+    <h3>Simulated BF TEM image</h3>
+    <canvas id="img" width="256" height="256"></canvas>
+  </div>
+  <div class="panel controls">
+    <h3>Controls</h3>
+    <label>Objective aperture half-angle α₀ = <span id="a0val">12.0</span> mrad</label>
+    <input type="range" id="a0" min="2" max="30" step="0.5" value="12">
+    <div class="presets">
+      <button data-p="5">5 mrad (small)</button>
+      <button data-p="12">12 mrad (medium)</button>
+      <button data-p="25">25 mrad (large)</button>
+    </div>
+    <label>Accelerating voltage</label>
+    <select id="kv">
+      <option value="80">80 kV  (α_c ≈ 12 mrad)</option>
+      <option value="120" selected>120 kV (α_c ≈ 10 mrad)</option>
+      <option value="200">200 kV (α_c ≈ 7 mrad)</option>
+    </select>
+    <div class="readout">
+      α_c = <span id="acval">10.0</span> mrad<br>
+      I(thin, x=0.5) = <span id="ithin">–</span><br>
+      I(thick, x=1.8) = <span id="ithick">–</span><br>
+      Michelson contrast C = <span id="cval">–</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" style="margin-top:16px;">
+  <div class="panel" style="flex:1; min-width:400px;">
+    <h3>Governing equation</h3>
+    <div class="eq">
+      I(x, α₀) = I₀ · [ 1 − (1 − e<sup>−k·x</sup>) · e<sup>−α₀² / (2α_c²)</sup> ]<br><br>
+      x  = mass-thickness (ρt, relative units; 0.5 = thin, 1.8 = thick)<br>
+      α₀ = objective aperture half-angle (mrad)<br>
+      α_c = characteristic scattering angle (mrad; smaller at higher kV)<br>
+      k  = effective scattering coefficient (set to 0.7 for the soft-material model)<br><br>
+      At small α₀ most scattered electrons are blocked → thick/dense regions appear dark → high contrast.
+      As α₀ grows, scattered electrons re-enter the BF beam → intensity difference shrinks → contrast falls.
+      Higher kV reduces α_c → scattering is more forward-peaked → a given aperture collects more scattered electrons → contrast decreases.
+    </div>
+  </div>
+</div>
+
+<footer>
+  AI used: DeepSeek — generated the initial HTML/JS skeleton and equation template. Physics model, parameter values, and preset ranges were verified by the author against TEM scattering theory. &nbsp;·&nbsp; Simulation for HW1 Q3, Topic 1.
+</footer>
+
+<script>
+const N = 256;
+const canvasXS = document.getElementById('xs');
+const ctxXS = canvasXS.getContext('2d');
+const canvasIMG = document.getElementById('img');
+const ctxIMG = canvasIMG.getContext('2d');
+
+// Pre-computed mass-thickness map (3 vertical bands + fixed speckle texture)
+const xMap = new Float32Array(N * N);
+for (let j = 0; j < N; j++) {
+  for (let i = 0; i < N; i++) {
+    const u = i / (N - 1);
+    let base;
+    if (u < 1/3) base = 0.5;
+    else if (u < 2/3) base = 1.0;
+    else base = 1.8;
+    const noise = 0.12 * Math.sin(i * 0.35) * Math.cos(j * 0.45) + 0.08 * Math.sin(i * 1.3 + j * 0.7);
+    xMap[j * N + i] = Math.max(0.05, base + noise);
+  }
+}
+
+const k = 0.7;
+const acByKV = { 80: 12, 120: 10, 200: 7 };
+let a0 = 12;
+let kv = 120;
+
+function getAC() { return acByKV[kv]; }
+
+function computeIntensity(x, a0, ac) {
+  const term = 1 - Math.exp(-k * x);
+  const factor = Math.exp(-(a0 * a0) / (2 * ac * ac));
+  return 1 - term * factor;
+}
+
+function updateImage() {
+  const ac = getAC();
+  const img = ctxIMG.createImageData(N, N);
+  for (let p = 0; p < N * N; p++) {
+    const I = computeIntensity(xMap[p], a0, ac);
+    const v = Math.max(0, Math.min(255, Math.round(I * 255)));
+    img.data[4*p]   = v;
+    img.data[4*p+1] = v;
+    img.data[4*p+2] = v;
+    img.data[4*p+3] = 255;
+  }
+  ctxIMG.putImageData(img, 0, 0);
+}
+
+function drawXS() {
+  const W = canvasXS.width, H = canvasXS.height;
+  ctxXS.clearRect(0, 0, W, H);
+  ctxXS.fillStyle = '#f8fafc'; ctxXS.fillRect(0, 0, W, H);
+
+  const x0 = 30, baseY = H - 45, width = W - 60;
+  const scaleY = 140 / 2.0;
+  const xVals = [0.5, 1.0, 1.8];
+  const colors = ['#b8d4ec', '#7ea8cc', '#4a7ca8'];
+
+  ctxXS.strokeStyle = '#888';
+  ctxXS.beginPath(); ctxXS.moveTo(x0 - 5, baseY); ctxXS.lineTo(x0 + width + 5, baseY); ctxXS.stroke();
+
+  for (let b = 0; b < 3; b++) {
+    const bx = x0 + b * (width / 3), bw = width / 3, h = xVals[b] * scaleY;
+    ctxXS.fillStyle = colors[b]; ctxXS.fillRect(bx, baseY - h, bw, h);
+    ctxXS.strokeStyle = '#1a3a5a'; ctxXS.strokeRect(bx, baseY - h, bw, h);
+    ctxXS.fillStyle = '#1a1a1a'; ctxXS.font = '13px sans-serif'; ctxXS.textAlign = 'center';
+    ctxXS.fillText('x = ' + xVals[b].toFixed(1), bx + bw/2, baseY + 18);
+    ctxXS.fillText(b === 0 ? 'thin' : b === 1 ? 'medium' : 'thick', bx + bw/2, baseY + 34);
+  }
+
+  ctxXS.fillStyle = '#1a3a5a'; ctxXS.font = 'bold 13px sans-serif'; ctxXS.textAlign = 'left';
+  ctxXS.fillText('Electron beam →', 10, 20);
+}
+
+function updateReadouts() {
+  const ac = getAC();
+  const Ithin = computeIntensity(0.5, a0, ac);
+  const Ithick = computeIntensity(1.8, a0, ac);
+  const C = (Ithin - Ithick) / (Ithin + Ithick);
+  document.getElementById('a0val').textContent = a0.toFixed(1);
+  document.getElementById('acval').textContent = ac.toFixed(1);
+  document.getElementById('ithin').textContent = Ithin.toFixed(3);
+  document.getElementById('ithick').textContent = Ithick.toFixed(3);
+  document.getElementById('cval').textContent = C.toFixed(3);
+}
+
+function updateAll() { updateImage(); updateReadouts(); }
+
+document.getElementById('a0').addEventListener('input', e => { a0 = parseFloat(e.target.value); updateAll(); });
+document.getElementById('kv').addEventListener('change', e => { kv = parseInt(e.target.value); updateAll(); });
+document.querySelectorAll('.presets button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    a0 = parseFloat(btn.dataset.p);
+    document.getElementById('a0').value = a0;
+    updateAll();
+  });
+});
+
+drawXS();
+updateAll();
+</script>
+</body>
+</html>
